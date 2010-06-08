@@ -1,0 +1,16 @@
+4359ed9c9715aa3d34c035099a83e654 *DESCRIPTION
+9fdfeb11f7ddba6f3aab9aaa6b1ac5dd *NAMESPACE
+19311c3e76f1192de6e2cc8e39052523 *R/RGCCA-internal.R
+38dd2a3ef1f2585c4558cbb1c068b8d8 *R/design.R
+eba72a35cb48cc596a20b92bf129c5c2 *R/mycov.R
+7f4ded76e3d3393e2675ef216c71e90e *R/myscale.R
+9f1f59a5a4be669aebec97a3f7c50abe *R/rgcca.R
+3d013612a11ae471c44960486d66f1a6 *R/tau.estimate.R
+b28d664962dbe4147d8b9b92ce5fc740 *data/Russett.RData
+914ac21e64422ebba9abf6ef3b37c4cb *man/RGCCA-package.Rd
+0183f4fef9438bf79d2246b14534634f *man/Russett.Rd
+629386b53f991af51279999efbab0397 *man/design.Rd
+21a04fe56fe60d5d0ee237d6855c294d *man/mycov.Rd
+b15965c8914fb9c73e6443bd6e114f99 *man/myscale.Rd
+6bfe0b13988a7ea7d82ea84dce3d6e0f *man/rgcca.Rd
+8da720c562782e3833ebb31611ebe85d *man/tau.estimate.Rd
