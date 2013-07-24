@@ -1,5 +1,10 @@
-# Default NAMESPACE created by R
-# Remove the previous line if you edit this file
-
-# Export all names
-exportPattern(".")
+export(cov2)
+export(defl.select)
+export(miscrossprod)
+export(rgcca)
+export(rgccak)
+export(scale2)
+export(sgcca)
+export(sgccak)
+export(soft.threshold)
+export(tau.estimate)

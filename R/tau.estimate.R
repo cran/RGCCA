@@ -1,40 +1,26 @@
-tau.estimate <- function(X,tar = diag(ncol(X))) {
-# check for possibly incorrect inputs
-    if (is.matrix(X)==TRUE && is.numeric(X)==FALSE) {                           
-    stop("The data matrix must be numeric!")}
-    # correlation matrix
-    p = ncol(X) ; n = nrow(X)
-    corm = cor(X)                                                               
-    # Standardization
-    X = myscale(X)
-    # matrix of the var_hat_s[i,j] in the formula for lambda                                                             
-    v = matrix(0,ncol=p,nrow=p)                                                 
-                                                                                
-    ind = which(upper.tri(v),arr.ind=TRUE)
-    vtmp = apply(ind,1, function(ii) sum( ( X[,ii[1]]*X[,ii[2]]- mean(X[,ii[1]]*X[,ii[2]]) )**2 ) )
-    v[ind] = (n/((n-1)^3))*vtmp ; 
-    v = v + t(v)    
-    
-    # matrix of the f_[ij]'s in the formula for lambda
-    f = matrix(0,ncol=p,nrow=p)                                                 
-                                                                                
-    ind = which(upper.tri(f) & tar != 0,arr.ind=TRUE)
-    ftmp = apply(ind,1, function(ii) 
-                  1/2*sum((X[,ii[1]]*X[,ii[1]]- mean(X[,ii[1]]*X[,ii[1]]) 
-                  + X[,ii[2]]*X[,ii[2]]- mean(X[,ii[2]]*X[,ii[2]]))
-                  * (X[,ii[1]]*X[,ii[2]]- mean(X[,ii[1]]*X[,ii[2]])))
-                )
-    f[ind] = (n/((n-1)^3))*ftmp ; f = f + t(f)    
+#' Estimation of the optimal shrinkage parameters as described in [1,2] and implemented in \code{\link[SHIP:SHIP-package]{SHIP}} [2]. 
+#' @param x  Data set on which the covariance matrix is estimated.
+#' @return \item{tau}{Optimal shrinkage intensity parameter}
+#' @title Optimal shrinkage intensity parameters.
+#' @references [1] Schaefer J. and Strimmer K., 2005. A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. Statist. Appl. Genet. Mol. Biol. 4:32.
+#' @references [2] Jelizarow M., Guillemot V., Tenenhaus A., Strimmer K., Boulesteix A.-L., 2010. Over-optimism in bioinformatics: an illustration. Bioinformatics 26:1990-1998.
+#' @export tau.estimate
 
-    corapn =  cov2cor(tar)
-    # matrix of the single values of the denominator in the formula for lambda
-    d = (corm - corapn)^2                                                       
-                                                                             
-    # formula for the shrinkage intensity (see Schäfer&Strimmer (2005))
-    lambda = (sum(v)- sum(corapn*f))/sum(d)                                     
-    lambda = max(min(lambda, 1), 0)                                              
-
-    return(lambda)
-
-
+tau.estimate <- function(x) {
+  if (is.matrix(x) == TRUE && is.numeric(x) == FALSE) 
+    stop("The data matrix must be numeric!")
+  p <- NCOL(x)
+  n <- NROW(x)
+  covm <- cov(x)
+  corm <- cor(x)
+  xs <- scale(x, center = TRUE, scale = TRUE)
+  v <- (n/((n - 1)^3)) * (crossprod(xs^2) - 1/n * (crossprod(xs))^2)
+  diag(v) <- 0
+  m <- matrix(rep(apply(xs^2, 2, mean), p), p, p)
+  I <- diag(NCOL(x))
+  d <- (corm - I)^2
+  tau <- (sum(v))/sum(d)
+  tau <- max(min(tau, 1), 0)
+  return(tau)
  }
+
