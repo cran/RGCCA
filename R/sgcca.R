@@ -124,8 +124,10 @@ sgcca <- function (A, C = 1-diag(length(A)), c1 = rep(1, length(A)), ncomp = rep
     }
     #-------------------------------------------------------
     
-    if (scale == TRUE) A = lapply(A, function(x) scale2(x, bias = bias))
-    
+    if (scale == TRUE) {
+      A = lapply(A, function(x) scale2(x, bias = bias))
+      A = lapply(A, function(x) x/sqrt(NCOL(x)))
+    }
     ####################################
     # sgcca with 1 component per block #
     ####################################

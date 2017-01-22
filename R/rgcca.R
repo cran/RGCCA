@@ -36,7 +36,7 @@
 #' analytical formula . If tau is a \eqn{1\times J} numeric vector, tau[j] is identical across the dimensions of block \eqn{\mathbf{X}_j}. 
 #' If tau is a matrix, tau[k, j] is associated with \eqn{\mathbf{X}_{jk}} (\eqn{k}th residual matrix for block \eqn{j})
 #' @param ncomp  A \eqn{1 \times J} vector that contains the numbers of components for each block (default: rep(1, length(A)), which gives one component per block.)
-#' @param scheme The value is "horst", "factorial" or "centroid" (default: "centroid").
+#' @param scheme The value is "horst", "factorial", "centroid" or any diffentiable convex function g function designed by the user (default: "centroid").
 #' @param scale  If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
 #' @param verbose  If verbose = TRUE, the progress will be report while computing (default: TRUE).
 #' @param init The mode of initialization to use in RGCCA algorithm. The alternatives are either by Singular Value Decompostion ("svd") or random ("random") (Default: "svd").
@@ -52,8 +52,9 @@
 #' @return \item{crit}{A vector that contains the values of the criteria across iterations.}
 #' @return \item{mode}{A \eqn{1 \times J} vector that contains the formulation ("primal" or "dual") applied to each of the \eqn{J} blocks within the RGCCA alogrithm} 
 #' @return \item{AVE}{indicators of model quality based on the Average Variance Explained (AVE): AVE(for one block), AVE(outer model), AVE(inner model).}
+#' @references Tenenhaus M., Tenenhaus A. and Groenen PJF (2017), Regularized generalized canonical correlation analysis: A framework for sequential multiblock component methods, Psychometrika, in press
+#' @references Tenenhaus A., Philippe C., & Frouin V. (2015). Kernel Generalized Canonical Correlation Analysis. Computational Statistics and Data Analysis, 90, 114-131.
 #' @references Tenenhaus A. and Tenenhaus M., (2011), Regularized Generalized Canonical Correlation Analysis, Psychometrika, Vol. 76, Nr 2, pp 257-284.
-#' @references Tenenhaus A. et al., (2013), Kernel Generalized Canonical Correlation Analysis, submitted.
 #' @references Schafer J. and Strimmer K., (2005), A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. Statist. Appl. Genet. Mol. Biol. 4:32.
 #' @title Regularized Generalized Canonical Correlation Analysis (RGCCA) 
 #' @examples
@@ -63,36 +64,47 @@
 #' data(Russett)
 #' X_agric =as.matrix(Russett[,c("gini","farm","rent")])
 #' X_ind = as.matrix(Russett[,c("gnpr","labo")])
-#' X_polit = as.matrix(Russett[ , c("demostab", "dictatur")])
+#' X_polit = as.matrix(Russett[ , c("demostab", "dictator")])
 #' A = list(X_agric, X_ind, X_polit)
 #' #Define the design matrix (output = C) 
 #' C = matrix(c(0, 0, 1, 0, 0, 1, 1, 1, 0), 3, 3)
 #' result.rgcca = rgcca(A, C, tau = c(1, 1, 1), scheme = "factorial", scale = TRUE)
-#' lab = as.vector(apply(Russett[, 10:12], 1, which.max))
+#' lab = as.vector(apply(Russett[, 9:11], 1, which.max))
 #' plot(result.rgcca$Y[[1]], result.rgcca$Y[[2]], col = "white", 
 #'      xlab = "Y1 (Agric. inequality)", ylab = "Y2 (Industrial Development)")
-#' text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], Russett[, 1], col = lab, cex = .7)
+#' text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], rownames(Russett), col = lab, cex = .7)
 #'
-#' ############################################
-#' # Example 2: RGCCA and mutliple components #
-#' ############################################
-#' ############################
-#' # plot(y1, y2) for (RGCCA) #
-#' ############################
-#' result.rgcca = rgcca(A, C, tau = rep(1, 3), ncomp = c(2, 2, 1), 
-#'                      scheme = "factorial", verbose = TRUE)
-# 'layout(t(1:2))
-#' plot(result.rgcca$Y[[1]][, 1], result.rgcca$Y[[2]][, 1], col = "white", xlab = "Y1 (GE)", 
-#'     ylab = "Y2 (CGH)", main = "Factorial plan of RGCCA")
-#' text(result.rgcca$Y[[1]][, 1], result.rgcca$Y[[2]][, 1], Russett[, 1], col = lab, cex = .6)
-#' plot(result.rgcca$Y[[1]][, 1], result.rgcca$Y[[1]][, 2], col = "white", xlab = "Y1 (GE)", 
-#'     ylab = "Y2 (GE)", main = "Factorial plan of RGCCA")
-#' text(result.rgcca$Y[[1]][, 1], result.rgcca$Y[[1]][, 2], Russett[, 1], col = lab, cex = .6)
-#'
+#' \dontrun{
+#' #############
+#' # Example 2 #
+#' #############
+#' data(Russett)
+#' X_agric =as.matrix(Russett[,c("gini","farm","rent")])
+#' X_ind = as.matrix(Russett[,c("gnpr","labo")])
+#' X_polit = as.matrix(Russett[ , c("inst", "ecks", "death", 
+#'                                  "demostab", "dictator")])
+#' A = list(X_agric, X_ind, X_polit, cbind(X_agric, X_ind, X_polit))
+#' 
+#' #Define the design matrix (output = C) 
+#' C = matrix(c(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0), 4, 4)
+#' result.rgcca = rgcca(A, C, tau = c(1, 1, 1, 0), ncomp = rep(2, 4), 
+#'                      scheme = function(x) x^4, scale = TRUE) # HPCA
+#' lab = as.vector(apply(Russett[, 9:11], 1, which.max))
+#' plot(result.rgcca$Y[[4]][, 1], result.rgcca$Y[[4]][, 2], col = "white", 
+#'      xlab = "Global Component 1", ylab = "Global Component 2")
+#' text(result.rgcca$Y[[4]][, 1], result.rgcca$Y[[4]][, 2], rownames(Russett), 
+#'      col = lab, cex = .7)
+#' }
 #' ######################################
 #' # example 3: RGCCA and leave one out #
 #' ######################################
 #' Ytest = matrix(0, 47, 3)
+#' X_agric =as.matrix(Russett[,c("gini","farm","rent")])
+#' X_ind = as.matrix(Russett[,c("gnpr","labo")])
+#' X_polit = as.matrix(Russett[ , c("demostab", "dictator")])
+#' A = list(X_agric, X_ind, X_polit)
+#' #Define the design matrix (output = C) 
+#' C = matrix(c(0, 0, 1, 0, 0, 1, 1, 1, 0), 3, 3)
 #' result.rgcca = rgcca(A, C, tau = rep(1, 3), ncomp = rep(1, 3), 
 #'                      scheme = "factorial", verbose = TRUE)
 #'                      
@@ -106,35 +118,46 @@
 #'      resB$a[[k]] = resB$a[[k]] else resB$a[[k]] = -resB$a[[k]]
 #'  }
 #'  Btest =lapply(A, function(x) x[i, ])
-#'  Btest[[1]]=(Btest[[1]]-attr(B[[1]],"scaled:center"))/(attr(B[[1]],"scaled:scale"))
-#'  Btest[[2]]=(Btest[[2]]-attr(B[[2]],"scaled:center"))/(attr(B[[2]],"scaled:scale"))
-#'  Btest[[3]]=(Btest[[3]]-attr(B[[3]],"scaled:center"))/(attr(B[[3]],"scaled:scale"))
+#'  Btest[[1]]=(Btest[[1]]-attr(B[[1]],"scaled:center")) /
+#'                  (attr(B[[1]],"scaled:scale"))/sqrt(NCOL(B[[1]]))
+#'  Btest[[2]]=(Btest[[2]]-attr(B[[2]],"scaled:center")) / 
+#'                  (attr(B[[2]],"scaled:scale"))/sqrt(NCOL(B[[2]]))
+#'  Btest[[3]]=(Btest[[3]]-attr(B[[3]],"scaled:center")) / 
+#'                  (attr(B[[3]],"scaled:scale"))/sqrt(NCOL(B[[3]]))
 #'  Ytest[i, 1] = Btest[[1]]%*%resB$a[[1]]
 #'  Ytest[i, 2] = Btest[[2]]%*%resB$a[[2]]
 #'  Ytest[i, 3] = Btest[[3]]%*%resB$a[[3]]
 #' }
-#' lab = apply(Russett[, 10:12], 1, which.max)
+#' lab = apply(Russett[, 9:11], 1, which.max)
 #' plot(result.rgcca$Y[[1]], result.rgcca$Y[[2]], col = "white", 
 #'      xlab = "Y1 (Agric. inequality)", ylab = "Y2 (Ind. Development)")
-#' text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], Russett[, 1], col = lab)
-#' text(Ytest[, 1], Ytest[, 2], substr(Russett[, 1], 1, 1), col = lab)
+#' text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], rownames(Russett), col = lab)
+#' text(Ytest[, 1], Ytest[, 2], substr(rownames(Russett), 1, 1), col = lab)
 #' @export rgcca
 
 
-rgcca <- function(A, C = 1-diag(length(A)), tau = rep(1, length(A)), ncomp = rep(1, length(A)), scheme = "centroid", scale = TRUE , init="svd", bias = TRUE, tol = .Machine$double.eps, verbose=TRUE) {
+rgcca <- function(A, C = 1-diag(length(A)), tau = rep(1, length(A)), ncomp = rep(1, length(A)), scheme = "centroid", scale = TRUE , init="svd", bias = TRUE, tol = 1e-8, verbose=TRUE) {
     if (any(ncomp < 1)) stop("Compute at least one component per block!")
     pjs <- sapply(A, NCOL)
     nb_row <- NROW(A[[1]])
     if (any(ncomp-pjs > 0)) stop("For each block, choose a number of components smaller than the number of variables!")
     #-------------------------------------------------------
+    if (mode(scheme) != "function") {
     if ((scheme != "horst" ) & (scheme != "factorial") & (scheme != "centroid")) {
-      stop("Choose one of the three following schemes: horst, centroid or factorial")
+      stop("Choose one of the three following schemes: horst, centroid, factorial or design the g function")
+      }
+    if (verbose) cat("Computation of the RGCCA block components based on the", scheme, "scheme \n")
     }
-    if (verbose) cat("Computation of the RGCCA block components based on the",scheme,"scheme \n")
+    if (mode(scheme) == "function" & verbose) {
+      cat("Computation of the RGCCA block components based on the g scheme \n")
+    }
     
     #-------------------------------------------------------
     
-    if (scale == TRUE) A = lapply(A, function(x) scale2(x, bias = bias))
+    if (scale == TRUE) {
+      A = lapply(A, function(x) scale2(x, bias = bias))
+      A = lapply(A, function(x) x/sqrt(NCOL(x)))
+    }
     
     if (!is.numeric(tau) & verbose) {
       cat("Optimal Shrinkage intensity paramaters are estimated \n")

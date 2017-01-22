@@ -7,7 +7,7 @@
 #' @param tau A \eqn{1 \times J} vector that contains the values of the shrinkage parameters \eqn{\tau_j}, \eqn{ j=1, \ldots J}. (Default: \eqn{\tau_j = 1}, \eqn{ j=1, \ldots, J}).
 #' If tau = "optimal" the shrinkage intensity paramaters are estimated using the Schafer and Strimmer (2005) 
 #' analytical formula. 
-#' @param scheme Either "horst", "factorial" or "centroid" (default: centroid).
+#' @param scheme Either "horst", "factorial", "centroid" or the g function (default: centroid).
 #' @param scale  if scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).
 #' @param verbose  Will report progress while computing if verbose = TRUE (default: TRUE).
 #' @param init The mode of initialization to use in the RGCCA algorithm. The alternatives are either by Singular Value Decompostion or random (default : "svd").
@@ -17,7 +17,7 @@
 #' @return \item{Z}{A \eqn{n \times J} matrix of RGCCA inner components}
 #' @return \item{a}{A list of outer weight vectors}
 #' @return \item{crit}{The values of the objective function to be optimized in each iteration of the iterative procedure.}
-#' @return \item{converg}{Speed of convergence of the algorithm to reach the tolerance.}
+# #' @return \item{converg}{Speed of convergence of the algorithm to reach the tolerance.}
 #' @return \item{AVE}{Indicators of model quality based on the Average Variance Explained (AVE): 
 #' AVE(for one block), AVE(outer model), AVE(inner model).}
 #' @return \item{C}{A design matrix that describes the relationships between blocks (user specified).}
@@ -28,9 +28,12 @@
 #' @references Schafer J. and Strimmer K., (2005), A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. Statist. Appl. Genet. Mol. Biol. 4:32.
 #' @title Internal function for computing the RGCCA parameters (RGCCA block components, outer weight vectors, etc.).
 #' @export rgccak
+#' @importFrom MASS ginv
+#' @importFrom stats cor rnorm
+#' @importFrom graphics plot
 
 rgccak <- function (A, C, tau = "optimal", scheme = "centroid", scale = FALSE, 
-                    verbose = FALSE, init="svd", bias = TRUE, tol = .Machine$double.eps) {
+                    verbose = FALSE, init="svd", bias = TRUE, tol = 1e-8) {
   A <- lapply(A, as.matrix)
   J <- length(A)
   n <- NROW(A[[1]])
@@ -96,18 +99,56 @@ rgccak <- function (A, C, tau = "optimal", scheme = "centroid", scale = FALSE,
                           Y[, j] = A[[j]] %*% a[[j]]}
             )
   }
+  
+  ifelse((mode(scheme) != "function"), {h <- function(x) switch(scheme,horst=x,factorial=x**2,centroid=abs(x))
+                                        crit_old <- sum(C*h(cov2(Y, bias = bias)))}
+                                     ,  crit_old <- sum(C*scheme(cov2(Y, bias = bias)))
+  )
     
   iter = 1
   crit = numeric()
-  converg = numeric()
+  #converg = numeric()
   Z = matrix(0, NROW(A[[1]]), J)
   a_temp = a
-    
-  g <- function(x) switch(scheme,horst=x,factorial=x**2,centroid=abs(x))
+  if (mode(scheme) == "function") dg = derivation(scheme)
   
   repeat {
     Yold <- Y
-            
+    
+    if (mode(scheme) == "function"){
+      
+      ############
+      # g scheme #
+      ############
+      
+        for (j in which.primal){
+          assign(formalArgs(scheme), cov2(Y[, j], Y))
+          dgx = as.vector(attr(eval(dg), "grad"))
+          ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(dgx, n), n, J, byrow = TRUE) * Y)
+                             a[[j]] = drop(1/sqrt(t(Z[, j]) %*% A[[j]] %*% t(A[[j]]) %*% Z[, j])) * (t(A[[j]]) %*% Z[, j])
+                             Y[, j] = A[[j]] %*% a[[j]]}
+                 , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(dgx, n), n, J, byrow = TRUE) * Y)
+                    a[[j]] = drop(1/sqrt(t(Z[, j]) %*% A[[j]] %*% M[[j]] %*% t(A[[j]]) %*% Z[, j])) * (M[[j]] %*% t(A[[j]]) %*% Z[, j])
+                    Y[, j] = A[[j]] %*% a[[j]]}
+          )
+        }
+      
+        for (j in which.dual) {
+          assign(formalArgs(scheme), cov2(Y[, j], Y))
+          dgx = as.vector(attr(eval(dg), "grad"))
+          ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(dgx, n), n, J, byrow = TRUE) * Y)
+                             alpha[[j]] = drop(1/sqrt(t(Z[, j]) %*% K[[j]] %*% Z[, j])) * Z[, j]
+                             a[[j]] = t(A[[j]])%*% alpha[[j]]
+                             Y[, j] = A[[j]] %*% a[[j]]}
+                 , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(dgx, n), n, J, byrow = TRUE) * Y)
+                    alpha[[j]] = drop(1/sqrt(t(Z[, j]) %*% K[[j]] %*% Minv[[j]] %*% Z[, j])) * (Minv[[j]] %*% Z[, j])
+                    a[[j]] = t(A[[j]])%*% alpha[[j]]
+                    Y[, j] = A[[j]] %*% a[[j]]}
+          )
+        }
+      }  
+        
+    else{
     ################
     # Horst Scheme #
     ################
@@ -145,21 +186,21 @@ rgccak <- function (A, C, tau = "optimal", scheme = "centroid", scale = FALSE,
     if (scheme == "factorial") {
                                               
         for (j in which.primal){
-          ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
+          ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
                              a[[j]] = drop(1/sqrt(t(Z[, j]) %*% A[[j]] %*% t(A[[j]]) %*% Z[, j])) * (t(A[[j]]) %*% Z[, j])
                              Y[, j] = A[[j]] %*% a[[j]]}
-                          , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
+                          , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
                              a[[j]] = drop(1/sqrt(t(Z[, j]) %*% A[[j]] %*% M[[j]] %*% t(A[[j]]) %*% Z[, j])) * (M[[j]] %*% t(A[[j]]) %*% Z[, j])
                              Y[, j] = A[[j]] %*% a[[j]]}
                 )
         }
           
         for (j in which.dual) {
-          ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
+          ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
                              alpha[[j]] = drop(1/sqrt(t(Z[, j]) %*% K[[j]] %*% Z[, j])) * Z[, j]
                              a[[j]] = t(A[[j]])%*% alpha[[j]]
                              Y[, j] = A[[j]] %*% a[[j]]}
-                          , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
+                          , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE) * Y)
                             alpha[[j]] = drop(1/sqrt(t(Z[, j]) %*% K[[j]] %*% Minv[[j]] %*% Z[, j])) * (Minv[[j]] %*% Z[, j])
                             a[[j]] = t(A[[j]])%*% alpha[[j]]
                             Y[, j] = A[[j]] %*% a[[j]]}
@@ -173,51 +214,52 @@ rgccak <- function (A, C, tau = "optimal", scheme = "centroid", scale = FALSE,
     
     if (scheme == "centroid") {
       for (j in which.primal) {
-        ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
+        ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
                            a[[j]] = drop(1/sqrt(t(Z[, j]) %*% A[[j]] %*% t(A[[j]]) %*% Z[, j])) * (t(A[[j]]) %*% Z[, j])
                            Y[, j] = A[[j]] %*% a[[j]]}
-                        , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
+                        , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
                            a[[j]] = drop(1/sqrt(t(Z[, j]) %*% A[[j]] %*% M[[j]] %*% t(A[[j]]) %*% Z[, j])) * (M[[j]] %*% t(A[[j]]) %*% Z[, j])
                            Y[, j] = A[[j]] %*% a[[j]]}
               )
       }
       
       for (j in which.dual) {
-        ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
+        ifelse(tau[j]==1, {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
                            alpha[[j]] = drop(1/sqrt(t(Z[, j]) %*% K[[j]] %*% Z[, j])) * Z[, j]
                            a[[j]] = t(A[[j]])%*% alpha[[j]]
                            Y[, j] = A[[j]] %*% a[[j]]}
-                        , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
+                        , {Z[, j] = rowSums(matrix(rep(C[j, ], n), n, J, byrow = TRUE) * sign(matrix(rep(cov2(Y[, j], Y), n), n, J, byrow = TRUE)) * Y)
                            alpha[[j]] = drop(1/sqrt(t(Z[, j]) %*% K[[j]] %*% Minv[[j]] %*% Z[, j])) * (Minv[[j]] %*% Z[, j])
                            a[[j]] = t(A[[j]])%*% alpha[[j]]
                            Y[, j] = A[[j]] %*% a[[j]]}
         )
       }
     }
-  
-    num_converg <- sum((rowSums(Yold) - rowSums(Y))^2)
-    den_converg <- sum(rowSums(Yold)^2)
-    converg[iter] <- num_converg/den_converg
+    }
+
     stationnary_point = rep(FALSE, length(A))
     for (j in 1:J) stationnary_point[j] = sum(round(abs(a_temp[[j]] - a[[j]]), 8) < tol) == NCOL(A[[j]])
   
     a_temp <- a
-    crit[iter] <- sum(C*g(cov2(Y, bias = bias)))
-  
-    if (iter > 1000) warning("The RGCCA algorithm did not converge after 1000 iterations.")
+    ifelse((mode(scheme) != "function"), {h <- function(x) switch(scheme,horst=x,factorial=x**2,centroid=abs(x))
+                                         crit[iter] <- sum(C*h(cov2(Y, bias = bias)))}
+                                       , crit[iter] <- sum(C*scheme(cov2(Y, bias = bias)))
+           )
     
-    if ((converg[iter] < tol & sum(stationnary_point) == J | iter > 1000)) 
+    if (iter > 1000) warning("The RGCCA algorithm did not converge after 1000 iterations.")
+    if ((abs(crit[iter]-crit_old) < tol) & (sum(stationnary_point) == J) | (iter > 1000)) 
           break
+    crit_old = crit[iter]
     iter <- iter + 1
   }
   
   if(sum(stationnary_point) == J & verbose) cat("The RGCCA algorithm converged to a fixed point of the stationary equations after", iter-1, "iterations \n")
-  if (verbose) plot(crit, xlab = "iteration", ylab = "criteria")
+  if (verbose) plot(crit[1:iter], xlab = "iteration", ylab = "criteria")
          
 
   AVEinner <- sum(C * cor(Y)^2/2)/(sum(C)/2)
-  result <- list(Y = Y, a = a, crit = crit[which(crit != 0)], 
-                converg = converg[which(converg != 0)],
+  result <- list(Y = Y, a = a, crit = crit, 
+                #converg = converg[which(converg != 0)],
                 AVE_inner = AVEinner, C = C, tau = tau, scheme = scheme)
   
   return(result)
