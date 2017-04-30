@@ -21,4 +21,3 @@ If bias = FALSE, \eqn{n-1} is used (default: TRUE).}
 cov2() is similar to cov() but has an additional argument. The denominator \eqn{n} (bias = TRUE) 
 can be used (instead of \eqn{n-1}) to give a biased estimator of the (co)variance.
 }
-

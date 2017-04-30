@@ -9,21 +9,21 @@ rgcca(A, C = 1 - diag(length(A)), tau = rep(1, length(A)), ncomp = rep(1,
   bias = TRUE, tol = 1e-08, verbose = TRUE)
 }
 \arguments{
-\item{A}{A list that contains the \eqn{J} blocks of variables \eqn{\mathbf{X_1}, \mathbf{X_2}, ..., \mathbf{X_J}}.}
+\item{A}{A list that contains the \eqn{J} blocks of variables \eqn{X_1, X_2, ..., X_J}.}
 
 \item{C}{A design matrix that describes the relationships between blocks (default: complete design).}
 
-\item{tau}{tau is either a \eqn{1 \times J} vector or a \eqn{\mathrm{max}(ncomp) \times J} matrix, and contains the values 
+\item{tau}{tau is either a \eqn{1 * J} vector or a \eqn{max(ncomp) * J} matrix, and contains the values 
 of the shrinkage parameters (default: tau = 1, for each block and each dimension).
 If tau = "optimal" the shrinkage paramaters are estimated for each block and each dimension using the Schafer and Strimmer (2005)
-analytical formula . If tau is a \eqn{1\times J} numeric vector, tau[j] is identical across the dimensions of block \eqn{\mathbf{X}_j}. 
-If tau is a matrix, tau[k, j] is associated with \eqn{\mathbf{X}_{jk}} (\eqn{k}th residual matrix for block \eqn{j})}
+analytical formula . If tau is a \eqn{1* J} numeric vector, tau[j] is identical across the dimensions of block \eqn{X_j}. 
+If tau is a matrix, tau[k, j] is associated with \eqn{X_{jk}} (\eqn{k}th residual matrix for block \eqn{j})}
 
-\item{ncomp}{A \eqn{1 \times J} vector that contains the numbers of components for each block (default: rep(1, length(A)), which gives one component per block.)}
+\item{ncomp}{A \eqn{1 * J} vector that contains the numbers of components for each block (default: rep(1, length(A)), which gives one component per block.)}
 
-\item{scheme}{The value is "horst", "factorial", "centroid" or any diffentiable convex function g function designed by the user (default: "centroid").}
+\item{scheme}{The value is "horst", "factorial", "centroid" or any diffentiable convex scheme function g designed by the user (default: "centroid").}
 
-\item{scale}{If scale = TRUE, each block is standardized to zero means and unit variances (default: TRUE).}
+\item{scale}{If scale = TRUE, each block is standardized to zero means and unit variances and then divided by the square root of its number of variables (default: TRUE).}
 
 \item{init}{The mode of initialization to use in RGCCA algorithm. The alternatives are either by Singular Value Decompostion ("svd") or random ("random") (Default: "svd").}
 
@@ -46,39 +46,39 @@ If tau is a matrix, tau[k, j] is associated with \eqn{\mathbf{X}_{jk}} (\eqn{k}t
 
 \item{scheme}{The scheme chosen by the user (user specified).}
 
-\item{ncomp}{A \eqn{1 \times J} vector that contains the numbers of components for each block (user specified).}
+\item{ncomp}{A \eqn{1 * J} vector that contains the numbers of components for each block (user specified).}
 
 \item{crit}{A vector that contains the values of the criteria across iterations.}
 
-\item{mode}{A \eqn{1 \times J} vector that contains the formulation ("primal" or "dual") applied to each of the \eqn{J} blocks within the RGCCA alogrithm}
+\item{primal_dual}{A \eqn{1 * J} vector that contains the formulation ("primal" or "dual") applied to each of the \eqn{J} blocks within the RGCCA alogrithm}
 
 \item{AVE}{indicators of model quality based on the Average Variance Explained (AVE): AVE(for one block), AVE(outer model), AVE(inner model).}
 }
 \description{
 Regularized Generalized Canonical Correlation Analysis (RGCCA) is a generalization
 of regularized canonical correlation analysis to three or more sets of variables. 
-Given \eqn{J} matrices \eqn{\mathbf{X_1}, \mathbf{X_2}, ..., \mathbf{X_J}} that represent 
+Given \eqn{J} matrices \eqn{X_1, X_2, ..., X_J} that represent 
 \eqn{J} sets of variables observed on the same set of \eqn{n} individuals. The matrices 
-\eqn{\mathbf{X_1}, \mathbf{X_2}, ..., \mathbf{X_J}} must have the same number of rows, 
+\eqn{X_1, X_2, ..., X_J} must have the same number of rows, 
 but may (and usually will) have different numbers of columns. The aim of RGCCA is to study 
 the relationships between these \eqn{J} blocks of variables. It constitutes a general 
 framework for many multi-block data analysis methods. It combines the power of 
 multi-block data analysis methods (maximization of well identified criteria) 
 and the flexibility of PLS path modeling (the researcher decides which blocks 
 are connected and which are not). Hence, the use of RGCCA requires the construction 
-(user specified) of a design matrix, (\eqn{\mathbf{C}}), that characterize 
-the connections between blocks. Elements of the (symmetric) design matrix \eqn{\mathbf{C} = (c_{jk})} 
+(user specified) of a design matrix \eqn{C}, that characterize 
+the connections between blocks. Elements of the symmetric design matrix \eqn{C = (c_{jk})} 
 is equal to 1 if block \eqn{j} and block \eqn{k} are connected, and 0 otherwise.
-The objective is to find a fixed point of the stationary equations related to the RGCCA optimization 
-problem. The function rgcca() implements a monotonically convergent algorithm (i.e. the bounded 
+The function rgcca() implements a monotonically convergent algorithm (i.e. the bounded 
 criteria to be maximized increases at each step of the iterative procedure) that is very 
-similar to the PLS algorithm proposed by Herman Wold. Moreover, depending on the 
-dimensionality of each block \eqn{\mathbf{X}_j}, \eqn{j = 1, \ldots, J}, the primal (when \eqn{n > p_j}) algorithm or 
-the dual (when \eqn{n < p_j}) algorithm is used (see Tenenhaus et al. 2013). 
+similar to the PLS algorithm proposed by Herman Wold and finds at convergence a stationnary point 
+of the RGCCA optimization problem. . Moreover, depending on the 
+dimensionality of each block \eqn{X_j}, \eqn{j = 1, ..., J}, the primal (when \eqn{n > p_j}) algorithm or 
+the dual (when \eqn{n < p_j}) algorithm is used (see Tenenhaus et al. 2015). 
 Moreover, by deflation strategy, rgcca() allow to compute several RGCCA block 
-components (specified by ncomp) for each block. Block components of each block are guaranteed to 
-be orthogonal with the use of the deflation. The so-called symmetric deflation is considered in
-this implementation, i.e. each block is deflated with respect to its own component.
+components (specified by ncomp) for each block. Within each block, block components are guaranteed to 
+be orthogonal using the deflation procedure. The so-called symmetric deflation is considered in
+this implementation, i.e. each block is deflated with respect to its own component(s).
 It should be noted that the numbers of components per block can differ from one block to another.
 }
 \examples{
@@ -98,7 +98,6 @@ plot(result.rgcca$Y[[1]], result.rgcca$Y[[2]], col = "white",
      xlab = "Y1 (Agric. inequality)", ylab = "Y2 (Industrial Development)")
 text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], rownames(Russett), col = lab, cex = .7)
 
-\dontrun{
 #############
 # Example 2 #
 #############
@@ -118,7 +117,8 @@ plot(result.rgcca$Y[[4]][, 1], result.rgcca$Y[[4]][, 2], col = "white",
      xlab = "Global Component 1", ylab = "Global Component 2")
 text(result.rgcca$Y[[4]][, 1], result.rgcca$Y[[4]][, 2], rownames(Russett), 
      col = lab, cex = .7)
-}
+ 
+\dontrun{
 ######################################
 # example 3: RGCCA and leave one out #
 ######################################
@@ -155,8 +155,11 @@ for (i in 1:nrow(Russett)){
 lab = apply(Russett[, 9:11], 1, which.max)
 plot(result.rgcca$Y[[1]], result.rgcca$Y[[2]], col = "white", 
      xlab = "Y1 (Agric. inequality)", ylab = "Y2 (Ind. Development)")
-text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], rownames(Russett), col = lab)
-text(Ytest[, 1], Ytest[, 2], substr(rownames(Russett), 1, 1), col = lab)
+text(result.rgcca$Y[[1]], result.rgcca$Y[[2]], rownames(Russett), 
+     col = lab, cex = .7)
+text(Ytest[, 1], Ytest[, 2], substr(rownames(Russett), 1, 1), 
+     col = lab, cex = .7)
+}
 }
 \references{
 Tenenhaus M., Tenenhaus A. and Groenen PJF (2017), Regularized generalized canonical correlation analysis: A framework for sequential multiblock component methods, Psychometrika, in press
@@ -167,4 +170,3 @@ Tenenhaus A. and Tenenhaus M., (2011), Regularized Generalized Canonical Correla
 
 Schafer J. and Strimmer K., (2005), A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. Statist. Appl. Genet. Mol. Biol. 4:32.
 }
-

@@ -15,4 +15,3 @@ soft(x, d)
 the function soft() encodes the soft-thresholding operator
 }
 \keyword{internal}
-

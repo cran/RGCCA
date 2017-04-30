@@ -7,9 +7,9 @@
 defl.select(yy, rr, nncomp, nn, nbloc)
 }
 \arguments{
-\item{yy}{A matrix that contains the SGCCA block components of each block: \eqn{\mathbf{y}_{1h}, \ldots, \mathbf{y}_{Jh}}}
+\item{yy}{A matrix that contains the SGCCA block components of each block: \eqn{y_{1h}, \ldots, y_{Jh}}}
 
-\item{rr}{A list that contains the residual matrices \eqn{\mathbf{X}_{1h}, \ldots, \mathbf{X}_{Jh}}}
+\item{rr}{A list that contains the residual matrices \eqn{X_{1h}, \ldots, X_{Jh}}}
 
 \item{nncomp}{A \eqn{1 \times J} vector that contains the number of components to compute for each block.}
 
@@ -18,12 +18,11 @@ defl.select(yy, rr, nncomp, nn, nbloc)
 \item{nbloc}{Number of blocks.}
 }
 \value{
-\item{resdefl}{A list of \eqn{J} elements that contains \eqn{\mathbf{X}_{1,h+1}, \ldots, \mathbf{X}_{J,h+1}}.}
+\item{resdefl}{A list of \eqn{J} elements that contains \eqn{X_{1,h+1}, \ldots, X_{J,h+1}}.}
 
-\item{pdefl}{A list of \eqn{J} elements that contains \eqn{\mathbf{p}_{1h}, \ldots, \mathbf{p}_{Jh}}.}
+\item{pdefl}{A list of \eqn{J} elements that contains \eqn{p_{1h}, \ldots, p_{Jh}}.}
 }
 \description{
-The function defl.select() computes residual matrices \eqn{\mathbf{X}_{1,h+1}, \ldots, \mathbf{X}_{J,h+1}}. These 
-residual matrices are determined according to the following formula: \eqn{\mathbf{X}_{j,h+1} = \mathbf{X}_{jh} - \mathbf{y}_{jh} \mathbf{p}_{jh}^t}.
+The function defl.select() computes residual matrices \eqn{X_{1,h+1}, \ldots, X_{J,h+1}}. These 
+residual matrices are determined according to the following formula: \eqn{X_{j,h+1} = X_{jh} - y_{jh} p_{jh}^t}.
 }
-

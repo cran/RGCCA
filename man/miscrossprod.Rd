@@ -18,4 +18,3 @@ miscrossprod(x, y)
 Given vectors \eqn{x} and \eqn{y} as arguments, the function miscrossprod() returns 
 the cross-product \eqn{x^ty}. miscrossprod() handles missing data.
 }
-

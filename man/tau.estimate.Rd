@@ -21,4 +21,3 @@ in a more general version within the SHIP package [2].
 
 [2] Jelizarow M., Guillemot V., Tenenhaus A., Strimmer K., Boulesteix A.-L., 2010. Over-optimism in bioinformatics: an illustration. Bioinformatics 26:1990-1998.
 }
-
