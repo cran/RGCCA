@@ -1,4 +1,4 @@
-ea516c6c865856fc3753523db96133e9 *DESCRIPTION
+98729f4c6d23df9f82be10115a12ad7c *DESCRIPTION
 b95b93983ae8b6d12f42b709f04485bf *NAMESPACE
 e6d7ae74445163f9c9ee8167462bbc57 *R/BinarySearch.R
 4a23b4a35b24b156e81c1b57d216f8dc *R/cov2.R
@@ -20,8 +20,8 @@ bb05275e8a44af0f9152a0625ac9e828 *R/soft.threshold.R
 3ff1937915cdb3c97b6af6cd9aaf956a *data/datalist
 eb154e792e1e9be36e599faafce6eefa *inst/doc/biblio.bib
 861e588940cd9b503a5f93fd6be9b1c9 *inst/doc/vignette_RGCCA.R
-837db67993a507e98a20a6611af8653f *inst/doc/vignette_RGCCA.Rmd
-d7ecc6b3dcf45e5b205fcf18c44c7846 *inst/doc/vignette_RGCCA.pdf
+ce8e1cf5ceea807adce85930862b0993 *inst/doc/vignette_RGCCA.Rmd
+5563da01d92e8ea2e2b75d06e8c951ef *inst/doc/vignette_RGCCA.pdf
 feaf34387b0389bbf2ac7a6db9e6694d *man/BinarySearch.Rd
 07ebd3d583f5d2414a7fd284a9d30797 *man/Russett.Rd
 14764cc6af10dd3add349cf39722c63e *man/cov2.Rd
@@ -35,12 +35,12 @@ b64685f925bb5c29bc12c740d4b882d2 *man/rgccak.Rd
 be94668b0b5e6cfd051bf2d92a10795c *man/soft.Rd
 7c31a0b024f9086dd9bcd2b86a206190 *man/soft.threshold.Rd
 427cb09512cad42ae7c53fdd5291d5eb *man/tau.estimate.Rd
+bf2e585565c9703c62b993b716e13772 *vignettes/Figures/glioma_rgcca_indiv.png
+40c94eb5964bc2d669e806a61fcc4a34 *vignettes/Figures/glioma_sgcca_indiv.png
+549a4638d9af12a8cda8b791caddb47d *vignettes/Figures/glioma_sgcca_superblock_indiv.png
+7ec76f6207f2ef9bade576947ea8c2aa *vignettes/Figures/glioma_sgcca_superblock_var.png
+0e2551f84332162634788a12c4cd52b6 *vignettes/Figures/stab_cgh.png
+b5f95cbaaa38e666427448604ad652f4 *vignettes/Figures/stab_ge.png
 eb154e792e1e9be36e599faafce6eefa *vignettes/biblio.bib
-bf2e585565c9703c62b993b716e13772 *vignettes/figures/glioma_rgcca_indiv.png
-40c94eb5964bc2d669e806a61fcc4a34 *vignettes/figures/glioma_sgcca_indiv.png
-549a4638d9af12a8cda8b791caddb47d *vignettes/figures/glioma_sgcca_superblock_indiv.png
-7ec76f6207f2ef9bade576947ea8c2aa *vignettes/figures/glioma_sgcca_superblock_var.png
-0e2551f84332162634788a12c4cd52b6 *vignettes/figures/stab_cgh.png
-b5f95cbaaa38e666427448604ad652f4 *vignettes/figures/stab_ge.png
-837db67993a507e98a20a6611af8653f *vignettes/vignette_RGCCA.Rmd
+ce8e1cf5ceea807adce85930862b0993 *vignettes/vignette_RGCCA.Rmd
 87969c159e4fa1c65efffd4d7d6cc5c4 *vignettes/vignette_RGCCA.html

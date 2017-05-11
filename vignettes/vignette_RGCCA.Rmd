@@ -1144,7 +1144,6 @@ g1
 
 ![Stability selection for GE.](Figures/stab_ge.png)
 
-  
 ```{r, eval = FALSE}
 stabCGH = data.frame(CGH_symbol = names(count_sort[[2]])[1:top],
                      Count = count_sort[[2]][1:top]/nb_boot)

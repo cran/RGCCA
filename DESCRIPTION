@@ -2,7 +2,7 @@ Package: RGCCA
 Type: Package
 Title: Regularized and Sparse Generalized Canonical Correlation
         Analysis for Multiblock Data
-Version: 2.1.1
+Version: 2.1.2
 Date: 2017-04-26
 Author: Arthur Tenenhaus and Vincent Guillemot
 Maintainer: Arthur Tenenhaus <arthur.tenenhaus@centralesupelec.fr>
@@ -10,9 +10,9 @@ Description: Multiblock data analysis concerns the analysis of several sets of v
 License: GPL (>= 2)
 Suggests: knitr, rmarkdown, ggplot2
 VignetteBuilder: knitr
-Imports: MASS, methods, Deriv
+Imports: MASS, Deriv
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-04-30 20:26:48 UTC; tenenhaus_art
+Packaged: 2017-05-10 21:19:55 UTC; tenenhaus_art
 Repository: CRAN
-Date/Publication: 2017-04-30 21:42:50 UTC
+Date/Publication: 2017-05-11 06:06:45 UTC
