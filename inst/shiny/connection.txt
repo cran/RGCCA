@@ -1,0 +1,4 @@
+"agriculture"	"industry"	"politic"
+"agriculture"	0	0	0
+"industry"	0	0	0
+"politic"	0	0	0
