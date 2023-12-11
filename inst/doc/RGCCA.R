@@ -1,4 +1,4 @@
-## ---- setup, include=FALSE----------------------------------------------------
+## ----setup, include=FALSE-----------------------------------------------------
 options(prompt = 'R> ', continue = '+ ')
 options(ggrepel.max.overlaps = Inf)
 
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   fig.path = "figures/"
 )
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  install.packages("RGCCA")
 
 ## -----------------------------------------------------------------------------
@@ -75,7 +75,7 @@ plot(fit, type = "biplot", block = 1,
      resp = lab, cex = 2,
      show_arrow = TRUE)
 
-## ---- size = "tiny"-----------------------------------------------------------
+## ----size = "tiny"------------------------------------------------------------
 summary(boot_out, block = 1:3, ncomp = 1)
 
 ## ----fig-boot1, fig.cap = 'Bootstrap confidence intervals for the block-weight vectors.', fig.height = 12, fig.width=18, fig.pos = "H"----
@@ -99,7 +99,7 @@ perm_out <- rgcca_permutation(blocks = A, connection = C,
                               n_cores = 1,
                               n_perms = 10)
 
-## ---- width=30----------------------------------------------------------------
+## ----width=30-----------------------------------------------------------------
 summary(perm_out)
 
 ## ----fig-permutation, fig.height = 12, fig.width=18, fig.pos = "H", fig.cap = "Values of the objective function of RGCCA against the sets of tuning parameters, triangles correspond to evaluations on non-permuted datasets."----
@@ -167,7 +167,7 @@ knitr::opts_chunk$set(eval = "gliomaData" %in% rownames(installed.packages()))
 ## -----------------------------------------------------------------------------
 #  summary(fit.sgcca)
 
-## ---- cache = TRUE------------------------------------------------------------
+## ----cache = TRUE-------------------------------------------------------------
 #  set.seed(0)
 #  in_train <- caret::createDataPartition(
 #    blocks[[3]], p = .75, list = FALSE
@@ -203,7 +203,7 @@ knitr::opts_chunk$set(eval = "gliomaData" %in% rownames(installed.packages()))
 ## -----------------------------------------------------------------------------
 #  projection <- rgcca_transform(fit, blocks_test = testing)
 
-## ---- cache = TRUE, message = FALSE-------------------------------------------
+## ----cache = TRUE, message = FALSE--------------------------------------------
 #  set.seed(0)
 #  fit_stab <- rgcca_stability(fit,
 #                              keep = vapply(
@@ -212,7 +212,7 @@ knitr::opts_chunk$set(eval = "gliomaData" %in% rownames(installed.packages()))
 #                              ),
 #                              n_boot = 100, verbose = TRUE, n_cores = 1)
 
-## ---- cache = TRUE------------------------------------------------------------
+## ----cache = TRUE-------------------------------------------------------------
 #  set.seed(0)
 #  boot_out <- rgcca_bootstrap(fit_stab, n_boot = 500)
 

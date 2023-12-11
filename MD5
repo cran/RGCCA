@@ -1,4 +1,4 @@
-1516f141f6b35bb29fb02bc0affd068b *DESCRIPTION
+6e8582744f8627e2364821c590b7dd2c *DESCRIPTION
 db19727590c6384c1ddf369b6a71ffcb *NAMESPACE
 bc1fef41f12f3a1b390179d39a1246c6 *NEWS.md
 97fb57cf608233518eb36826481c42c1 *R/ECSI.R
@@ -68,7 +68,7 @@ f4d13d7adc4bb01b19faf35d1d861f72 *R/scale2.R
 576e3e901853b15981fa4100c8b62faf *R/scale_lambda1.R
 24284a28eca91820d261a4226e60fd20 *R/scaling.R
 187fc070091f9bcd965f251d9b722ec5 *R/select_analysis.R
-2adea491544f83b1f042639dde38fabe *R/set_parameter_grid.R
+bd18f56001825eea2222021f6f528fce *R/set_parameter_grid.R
 baa9dea560301282687f599e8858ef2c *R/sgcca.R
 e87cf6dbb1c8442fceff70221f2c0347 *R/sgcca_init.R
 c764a3ac97653d4140cf80c89dfe2286 *R/sgcca_postprocess.R
@@ -92,9 +92,9 @@ fe3f69ed3ef2e75937ff44b45d77ea60 *data/ECSI.rda
 6e1dd967d1ca4f160ef0f4256a484c0b *data/Russett.rda
 56e4bdd7d90eecec466b6597a1d56be2 *data/datalist
 362f8f316f949f764c9f40a6dcc20752 *inst/CITATION
-bbda72c9272e33f4743251cd8ca05347 *inst/doc/RGCCA.R
+504cc92beb8c11edd0fe0f3d15456a91 *inst/doc/RGCCA.R
 fb40dc2f203442fa23137412bd9f0896 *inst/doc/RGCCA.Rmd
-6130522dcacfe48614267bb2ba5c55c8 *inst/doc/RGCCA.pdf
+9101f5a94cf4945db54db2909354bc07 *inst/doc/RGCCA.pdf
 e171a3408fdad51202bd326e773176cb *man/ECSI.Rd
 d90c27b7d2d3e6cc3f4b1b6ea32ca05f *man/Russett.Rd
 bb21543755e031e052adce4069384e8b *man/available_methods.Rd
